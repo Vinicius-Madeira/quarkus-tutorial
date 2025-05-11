@@ -21,7 +21,6 @@ public class Film {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Lob
     @Column(name = "description")
     private String description;
 
@@ -43,13 +42,12 @@ public class Film {
     @Column(name = "replacement_cost", nullable = false, precision = 5, scale = 2)
     private BigDecimal replacementCost;
 
-    @ColumnDefault("'G'")
     @Lob
     @Column(name = "rating", columnDefinition = "enum('G', 'PG', 'PG-13', 'R', 'NC-17')")
     private String rating;
 
     @Lob
-    @Column(name = "special_features", columnDefinition = "enum('Trailers', 'Commentaries', 'Deleted Scenes', 'Behind the Scenes')")
+    @Column(name = "special_features", columnDefinition = "set('Trailers', 'Commentaries', 'Deleted Scenes', 'Behind the Scenes')")
     private String specialFeatures;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -151,4 +149,11 @@ public class Film {
         this.lastUpdate = lastUpdate;
     }
 
+    public List<Actor> getActors() {
+        return actors;
+    }
+
+    public void setActors(List<Actor> actors) {
+        this.actors = actors;
+    }
 }
