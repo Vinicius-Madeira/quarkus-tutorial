@@ -5,9 +5,11 @@ import com.speedment.jpastreamer.projection.Projection;
 import com.speedment.jpastreamer.streamconfiguration.StreamConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.vinimad.app.model.Film;
 import org.vinimad.app.model.Film$;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -22,6 +24,12 @@ public class FilmRepository {
         return jpaStreamer.stream(Film.class)
                 .filter(Film$.id.in(filmId))
                 .findFirst();
+    }
+
+    public Stream<Film> getFilms(short minLength) {
+        return jpaStreamer.stream(Film.class)
+                .filter(Film$.length.greaterThan(minLength))
+                .sorted(Film$.length);
     }
 
     public Stream<Film> paged(long page, short minLength) {
@@ -39,4 +47,12 @@ public class FilmRepository {
                 .sorted(Film$.length.reversed());
     }
 
+    @Transactional
+    public void updateRentalRate(short minLength, BigDecimal rentalRate) {
+        jpaStreamer.stream(Film.class)
+                .filter(Film$.length.greaterThan(minLength))
+                .forEach(film -> {
+                    film.setRentalRate(rentalRate);
+                });
+    }
 }

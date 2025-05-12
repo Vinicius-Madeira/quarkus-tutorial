@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.vinimad.app.model.Film;
 import org.vinimad.app.model.repository.FilmRepository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -55,5 +56,13 @@ public class FilmResource {
                                 .collect(Collectors.joining("\n"));
     }
 
+    @GET
+    @Path("/update/{minLength}/{rentalRate}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String update(short minLength, BigDecimal rentalRate) {
+        filmRepository.updateRentalRate(minLength, rentalRate);
+        return filmRepository.getFilms(minLength).map(film -> String.format("%s (%d min) - %f", film.getTitle(), film.getLength(), film.getRentalRate()))
+                .collect(Collectors.joining("\n"));
+    }
 
 }
