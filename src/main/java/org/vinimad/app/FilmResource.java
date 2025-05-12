@@ -10,6 +10,7 @@ import org.vinimad.app.model.Film;
 import org.vinimad.app.model.repository.FilmRepository;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Path("/")
 public class FilmResource {
@@ -30,6 +31,28 @@ public class FilmResource {
     public String getFilm(short filmId) {
         Optional<Film> film = filmRepository.getFilm(filmId);
         return film.isPresent() ? film.get().getTitle() : "No film was found!";
+    }
+
+    @GET
+    @Path("/pagedFilms/{page}/{minLength}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String paged(long page, short minLength) {
+        return filmRepository.paged(page, minLength)
+                .map(film -> String.format("%s (%d min)", film.getTitle(), film.getLength()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    @GET
+    @Path("/pagedActors/{startsWith}/{minLength}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String paged(String startsWith, short minLength) {
+        return filmRepository.actors(startsWith, minLength)
+                .map(film -> String.format("%s (%d min): %s",
+                        film.getTitle(),
+                        film.getLength(),
+                        film.getActors().stream().map(actor -> String.format("%s %s", actor.getFirstName(), actor.getLastName()))
+                                .collect(Collectors.joining(", "))))
+                                .collect(Collectors.joining("\n"));
     }
 
 
